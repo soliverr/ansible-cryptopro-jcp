@@ -1,0 +1,54 @@
+---
+# tasks file for ansible-cryptopro-jcp
+
+- name: Install required packages
+  tags: cryptopro-jcp
+  include_role:
+    name: packages
+  vars:
+    packages_add:
+      - unzip
+      - xauth
+      - libXext
+      - libXrender
+      - libXtst
+
+- name: Include assets persistency tasks
+  tags: cryptopro-jcp
+  include: "{{ role_path }}/../silpion.lib/tasks/datapersistency.yml"
+  vars:
+    include_tags: cryptopro-jcp
+
+- name: Copy CryptoPro JCP distribution to target host
+  tags: cryptopro-jcp
+  include: "{{ role_path }}/../silpion.lib/tasks/copy.yml"
+  vars:
+    filename: "{{ cryptopro_jcp_archive }}"
+    include_tags: cryptopro-jcp
+
+- name: Create CryptoPro JCP HOME directory
+  tags: cryptopro-jcp
+  file:
+    path: "{{ cryptopro_jcp_home }}"
+    state: directory
+    mode: 0755
+
+- name: Extract CryptoPro JCP installation files
+  tags: cryptopro-jcp
+  unarchive:
+    src: "{{ lib_persistent_data_path_remote }}/{{ cryptopro_jcp_archive }}"
+    dest: "{{ cryptopro_jcp_home }}"
+    remote_src: true
+    creates: "{{ cryptopro_jcp_home }}/lib"
+
+- name: Install CryptoPro JCP
+  tags: cryptopro-jcp
+  command: "{{ cryptopro_jcp_home }}/lib/install.sh {{ cryptopro_jcp_java_home }} {{ cryptopro_jcp_licence }} {{ cryptopro_jcp_company }}"
+  args:
+    creates: "{{ cryptopro_jcp_java_home }}/.systemPrefs/ru/CryptoPro/Install"
+
+# Show installed packages
+#{{ cryptopro_jcp_java_home }}/bin/java -classpath {{ cryptopro_jcp_home }}/lib/JCPinst.jar ru.CryptoPro.Install.VariantTwo -installed
+
+# Check license
+#{{ cryptopro_jcp_java_home }}/bin/java -classpath {{ cryptopro_jcp_home }}/lib/JCP.jar ru.CryptoPro.JCP.tools.License -serial '{{ cryptopro_jcp_licence }}' -company '{{ cryptopro_jcp_comany }}'

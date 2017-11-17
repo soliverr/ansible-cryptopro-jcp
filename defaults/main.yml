@@ -1,0 +1,16 @@
+---
+# defaults for ansible-cryptopro-jcp
+
+# Default CryptoPro JCP
+cryptopro_jcp_version: 1.0.54
+cryptopro_jcp_archive: "jcp.{{ cryptopro_jcp_version }}.zip"
+
+# Default HOME directory
+cryptopro_jcp_home: "/opt/jcp-{{ cryptopro_jcp_version }}"
+
+# Default for licence
+cryptopro_jcp_licence: 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
+cryptopro_jcp_company: 'Your Company'
+
+# Default JAVA HOME
+cryptopro_jcp_java_home: /usr/lib/java
