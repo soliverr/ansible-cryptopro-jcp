@@ -45,7 +45,21 @@
   tags: cryptopro-jcp
   command: "{{ cryptopro_jcp_home }}/lib/install.sh {{ cryptopro_jcp_java_home }} {{ cryptopro_jcp_licence }} {{ cryptopro_jcp_company }}"
   args:
-    creates: "{{ cryptopro_jcp_java_home }}/.systemPrefs/ru/CryptoPro/Install"
+    creates: "{{ cryptopro_jcp_java_home }}/lib/ext/JCP.jar"
+
+- name: Check if CryptoPro JCP preferences installed in system Java directory
+  tags: cryptopro-jcp
+  stat:
+    path: "/etc/.java/.systemPrefs/ru/CryptoPro"
+  register: _cryptopro_jcp_prefs
+
+- name: Create symlink for CryptoPro JCP preferences in JAVA_HOME
+  tags: cryptopro-jcp
+  when: _cryptopro_jcp_prefs.stat.exists
+  file:
+    src: /etc/.java/.systemPrefs
+    dest:  "{{ cryptopro_jcp_java_home }}/.systemPrefs"
+    state: link
 
 # Show installed packages
 #{{ cryptopro_jcp_java_home }}/bin/java -classpath {{ cryptopro_jcp_home }}/lib/JCPinst.jar ru.CryptoPro.Install.VariantTwo -installed
