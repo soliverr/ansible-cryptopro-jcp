@@ -1,0 +1,19 @@
+---
+#
+# Switch off stupid GUI warning:
+#   "Ключи ГОСТ Р 34.10-2001 нельзя использовать для выработки подписи с 01.01.2019.
+#    Необходимо заранее перейти на использование ключей ГОСТ Р 34.10-2012"
+#
+
+# FIXME: convert one line '<map MAP_XML_VERSION="1.0"/>'
+#        to multiline     '<map MAP_XML_VERSION="1.0">
+#                          </map>'
+#
+- name: Swich off stupid GUI warning
+  tags: cryptopro-jcp
+  lineinfile:
+    path: "{{ cryptopro_jcp_java_home }}//.systemPrefs/ru/CryptoPro/JCP/tools/prefs.xml"
+    state: present
+    regexp: 'key="Gost2001Warning_class_default" value="true"'
+    insertafter: 'map MAP_XML_VERSION="1.0"'
+    line: '    <entry key="Gost2001Warning_class_default" value="true"/>'

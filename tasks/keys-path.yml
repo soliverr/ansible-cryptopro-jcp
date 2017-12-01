@@ -1,0 +1,11 @@
+---
+#
+# Bind HDIMAGE to CryptoPro JCP
+#
+- name: Set keys path for CryptoPro JCP
+  tags: cryptopro-jcp
+  template:
+    src: hdimage_prefs.xml.j2
+    dest: "{{ cryptopro_jcp_java_home }}//.systemPrefs/ru/CryptoPro/JCP/KeyStore/HDImage/prefs.xml"
+    mode: 0644
+    backup: true

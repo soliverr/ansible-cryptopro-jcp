@@ -3,14 +3,14 @@
 
 # Default CryptoPro JCP
 cryptopro_jcp_version: 1.0.54
-cryptopro_jcp_archive: "jcp.{{ cryptopro_jcp_version }}.zip"
+cryptopro_jcp_archive: "{{ 'jcp_plus_jtls_' if cryptopro_jcp_version == '1.0.54' else 'jcp-' }}{{ cryptopro_jcp_version }}.zip"
 
 # Default HOME directory
-cryptopro_jcp_home: "/opt/jcp-{{ cryptopro_jcp_version }}"
-
-# Default for licence
-cryptopro_jcp_licence: 'XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'
-cryptopro_jcp_company: 'Your Company'
+cryptopro_jcp_dir: "{{ 'jcp.' if cryptopro_jcp_version == '1.0.54' else 'jcp-' }}{{ cryptopro_jcp_version }}"
+cryptopro_jcp_home: "/opt/{{ cryptopro_jcp_dir }}"
 
 # Default JAVA HOME
 cryptopro_jcp_java_home: /usr/lib/java
+
+# Set to true if old GOST R 34.10-2001 keys are used
+cryptopro_jcp_old_keys: false

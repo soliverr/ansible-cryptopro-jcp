@@ -37,14 +37,38 @@
   tags: cryptopro-jcp
   unarchive:
     src: "{{ lib_persistent_data_path_remote }}/{{ cryptopro_jcp_archive }}"
-    dest: "{{ cryptopro_jcp_home }}"
+    dest: "{{ cryptopro_jcp_home | replace( cryptopro_jcp_dir, '') }}"
     remote_src: true
     creates: "{{ cryptopro_jcp_home }}/lib"
 
+- name: Set execution flag on install scripts
+  tags: cryptopro-jcp
+  when: cryptopro_jcp_version == '1.0.54'
+  with_items:
+    - ControlPane.sh
+    - install.sh
+    - uninstall.sh
+  file:
+    path: "{{ cryptopro_jcp_home }}/lib/{{ item }}"
+    mode: 755
+
+# Install various versions of CryptoPro CSP
+- set_fact:
+    _jcp_installer: "{{ cryptopro_jcp_home }}/lib/install.sh {{ cryptopro_jcp_java_home }} {{ cryptopro_jcp_licence|default(omit) }} {{ cryptopro_jcp_company|default(omit) }}"
+  when: cryptopro_jcp_version == '1.0.54'
+  tags: cryptopro-jcp
+
+- set_fact:
+    _jcp_installer: "{{ cryptopro_jcp_home }}/setup_console.sh {{ cryptopro_jcp_java_home }} -force -en -install -jre {{ cryptopro_jcp_java_home }} {{ cryptopro_modules|default('-jcp -jcryptop')}} {{ '-serial_jcp '+cryptopro_jcp_licence if cryptopro_jcp_licence else '' }}"
+  when: cryptopro_jcp_version in [ '2.0.39014', '2.0.39442' ]
+  tags: cryptopro-jcp
+
 - name: Install CryptoPro JCP
   tags: cryptopro-jcp
-  command: "{{ cryptopro_jcp_home }}/lib/install.sh {{ cryptopro_jcp_java_home }} {{ cryptopro_jcp_licence }} {{ cryptopro_jcp_company }}"
+  when:
+  command: "{{ _jcp_installer }}"
   args:
+    chdir: "{{ cryptopro_jcp_home }}"
     creates: "{{ cryptopro_jcp_java_home }}/lib/ext/JCP.jar"
 
 - name: Check if CryptoPro JCP preferences installed in system Java directory
@@ -60,6 +84,23 @@
     src: /etc/.java/.systemPrefs
     dest:  "{{ cryptopro_jcp_java_home }}/.systemPrefs"
     state: link
+
+- name: Create empty HDIMAGE hierarchy
+  tags: cryptopro-jcp
+  script: "{{ role_path }}/files/create_HDIMAGE.sh {{ cryptopro_jcp_hdimage }}"
+  args:
+    creates: "{{ cryptopro_jcp_hdimage }}/keys"
+
+- include: keys-path.yml
+  tags: cryptopro-jcp
+  static: yes
+
+- include: warn-disable.yml
+  tags: cryptopro-jcp
+  when: cryptopro_jcp_old_keys
+  static: yes
+
+
 
 # Show installed packages
 #{{ cryptopro_jcp_java_home }}/bin/java -classpath {{ cryptopro_jcp_home }}/lib/JCPinst.jar ru.CryptoPro.Install.VariantTwo -installed

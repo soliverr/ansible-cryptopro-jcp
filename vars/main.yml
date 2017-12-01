@@ -1,2 +1,8 @@
 ---
 # vars file for ansible-cryptopro-jcp
+
+# Path for CryptoPro HDIMAGE
+cryptopro_jcp_hdimage: /var/opt/cprocsp
+
+# Path for keys
+cryptopro_jcp_keys_path: "{{ cryptopro_jcp_hdimage }}/keys"
